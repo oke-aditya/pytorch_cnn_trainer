@@ -7,6 +7,8 @@
 
 A simple engine to fine tune CNNs from [torchvision](https://github.com/pytorch/vision) and [Pytorch Image models](https://github.com/rwightman/pytorch-image-models) from Ross Wightman.
 
+![Example](images/example.png)
+
 ## Why This Package ?
 
 It is very annoying to write training loop and training code for CNN training. Also to support all the training features it takes massive time.
@@ -44,7 +46,6 @@ Some examples that are provided.
 
 # To Do: -
 
-
 - [x] Support PyTorch image models (timm).
 - [x] Quantization Aware training example.
 - [x] Early stopping with patience.
@@ -58,6 +59,6 @@ Some examples that are provided.
 - [x] Add docstring, create package, etc.
 - [x] Minimal tests and examples.
 
-Hope this repo helps guys to train models using transfer learning. 
+Hope this repo helps people to train models using transfer learning. 
 
-If you like it do give it a * and tell people about it.
+If you like it do give * and tell people about it.
