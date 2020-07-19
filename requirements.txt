@@ -3,3 +3,4 @@ tqdm
 timm
 matplotlib
 numpy
+pytorch_lightning
