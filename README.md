@@ -3,8 +3,6 @@
 ![Check Formatting](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Check%20Formatting/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-<----------UNDER CONSTRUCTION-------------------->
-
 ## Train CNN for your task.
 
 A simple engine to train your CNN. It aims to support most features that you would ever use to train CNN.
@@ -38,8 +36,8 @@ It will train on multiple GPUs just the way lightning supports.
 - [x] Support torchvision quantized models transfer learning.
 - [ ] Mixed precision training using PyTorch 1.6
 - [ ] PyTorch Lightning Trainer with all these features.
-- [ ] Add docstring, create package, etc.
-- [ ] Try to add unit tests.
+- [x] Add docstring, create package, etc.
+- [x] Minimal tests and examples.
 
 Hope this repo helps guys to train models using transfer learning. 
 
