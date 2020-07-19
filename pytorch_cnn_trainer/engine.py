@@ -15,7 +15,7 @@ Some Improvement I am trying to make
 """
 
 import torch
-import utils
+from pytorch_cnn_trainer import utils
 from tqdm import tqdm
 import time
 
