@@ -6,7 +6,7 @@ from pytorch_cnn_trainer import model_factory
 from pytorch_cnn_trainer import engine
 from tqdm import tqdm
 import torch.nn as nn
-import utils
+from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import dataset
 import torch.quantization
 from torch.quantization import QuantStub, DeQuantStub

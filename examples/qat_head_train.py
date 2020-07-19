@@ -5,7 +5,7 @@ import torchvision.models.quantization as models
 from pytorch_cnn_trainer import engine
 import config
 import torch
-import utils
+from pytorch_cnn_trainer import utils
 import torch.optim as optim
 from tqdm import tqdm
 import time

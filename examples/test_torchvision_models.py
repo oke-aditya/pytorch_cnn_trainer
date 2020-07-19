@@ -7,7 +7,7 @@ import torchvision.transforms as T
 from pytorch_cnn_trainer import dataset
 from pytorch_cnn_trainer import model_factory
 import config
-import utils
+from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import engine
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
