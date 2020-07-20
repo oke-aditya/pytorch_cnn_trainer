@@ -86,6 +86,7 @@ def train_step(
             scheduler.step()
 
         batch_time_m.update(time.time() - batch_start)
+        batch_start = time.time()
         if last_batch or batch_idx % log_interval == 0:  # If we reach the log intervel
             print(
                 "Batch Train Time: {batch_time.val:.3f} ({batch_time.avg:.3f})  "
