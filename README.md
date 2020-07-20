@@ -51,6 +51,8 @@ Some examples that are provided.
 - [x] Early stopping with patience.
 - [x] Support torchvision models transfer learning.
 - [x] Add Keras Like fit method.
+- [ ] Sanity Check for fit
+- [ ] Add Support for multi label classification.
 - [ ] Add history like object as in Keras for plotting.
 - [ ] Other metrics such as precision, recall, f1, etc.
 - [x] Support torchvision quantized models transfer learning.
