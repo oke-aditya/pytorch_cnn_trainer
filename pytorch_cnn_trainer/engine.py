@@ -284,7 +284,8 @@ def train_sanity_fit(
     criterion,
     device,
     num_batches: int = None,
-    log_interval: int = 100,):
+    log_interval: int = 100,
+):
     """
     Performs Sanity fit over train loader.
     Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
@@ -345,7 +346,8 @@ def val_sanity_fit(
     criterion,
     device,
     num_batches: int = None,
-    log_interval: int = 100,):
+    log_interval: int = 100,
+):
     """
     Performs Sanity fit over valid loader.
     Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
