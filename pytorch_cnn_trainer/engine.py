@@ -22,7 +22,14 @@ import time
 # import model
 from collections import OrderedDict
 
-__all__ = ["train_step", "val_step", "fit"]
+__all__ = [
+    "train_step",
+    "val_step",
+    "fit",
+    "train_sanity_fit",
+    "val_sanity_fit",
+    "sanity_fit",
+]
 
 
 def train_step(
@@ -45,7 +52,7 @@ def train_step(
         optimizer : Torch optimizer to train.
         scheduler : Learning rate scheduler.
         num_batches : (optional) Integer To limit training to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
 
     start_train_step = time.time()
@@ -121,7 +128,9 @@ def train_step(
     return metrics
 
 
-def val_step(model, val_loader, criterion, device, num_batches=None, log_interval=100):
+def val_step(
+    model, val_loader, criterion, device, num_batches=None, log_interval: int = 100
+):
     """
     Performs one step of validation. Calculates loss, forward pass and returns metrics.
     Args:
@@ -130,7 +139,7 @@ def val_step(model, val_loader, criterion, device, num_batches=None, log_interva
         criterion : Loss function to be optimized.
         device : "cuda" or "cpu"
         num_batches : (optional) Integer To limit validation to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
     start_test_step = time.time()
     last_idx = len(val_loader) - 1
@@ -218,8 +227,8 @@ def fit(
     optimizer,
     scheduler=None,
     early_stopper=None,
-    num_batches=None,
-    log_interval=100,
+    num_batches: int = None,
+    log_interval: int = 100,
 ):
     """
     A fit function that performs training for certain number of epochs.
@@ -234,7 +243,7 @@ def fit(
         scheduler : (optional) Learning Rate scheduler.
         early_stopper: (optional) A utils provied early stopper, based on validation loss.
         num_batches : (optional) Integer To limit validation to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
     for epoch in tqdm(range(epochs)):
         print()
@@ -267,3 +276,164 @@ def fit(
         print("Done Training, Model Saved to Disk")
 
     return True  # For now, we should probably return an history object like keras.
+
+
+def train_sanity_fit(
+    model,
+    train_loader,
+    criterion,
+    device,
+    num_batches: int = None,
+    log_interval: int = 100,
+):
+    """
+    Performs Sanity fit over train loader.
+    Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
+    It iterates over both train_loader and valid_loader for given batches.
+    Note: - It does not to loss.backward().
+    Args:
+        model : A pytorch CNN Model.
+        train_loader : Train loader.
+        criterion : Loss function to be optimized.
+        device : "cuda" or "cpu"
+        num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+    """
+    model.train()
+    cnt = 0
+    last_idx = len(train_loader) - 1
+    train_sanity_start = time.time()
+
+    for batch_idx, (inputs, target) in enumerate(train_loader):
+        last_batch = batch_idx == last_idx
+        # data_time_m.update(time.time() - batch_start)
+        inputs = inputs.to(device)
+        target = target.to(device)
+        output = model(inputs)
+
+        loss = criterion(output, target)
+        cnt += 1
+
+        if last_batch or batch_idx % log_interval == 0:
+            print(
+                "Train Sanity check passed for batch till {} batches".format(batch_idx)
+            )
+
+        if num_batches is not None:
+            if cnt >= num_batches:
+                print("Sanity check passed till {} train batches".format(cnt))
+                print("All specicied batches done.")
+                train_sanity_end = time.time()
+                print(
+                    "Training Sanity check passed in time {} !!".format(
+                        train_sanity_end - train_sanity_start
+                    )
+                )
+                return True
+
+    train_sanity_end = time.time()
+    print(
+        "Training Sanity check passed in time {} !!".format(
+            train_sanity_end - train_sanity_start
+        )
+    )
+    return True
+
+
+def val_sanity_fit(
+    model,
+    valid_loader,
+    criterion,
+    device,
+    num_batches: int = None,
+    log_interval: int = 100,
+):
+    """
+    Performs Sanity fit over valid loader.
+    Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
+    It iterates over both train_loader and valid_loader for given batches.
+    Note: - It does not to loss.backward().
+    Args:
+        model : A pytorch CNN Model.
+        val_loader : Validation loader.
+        criterion : Loss function to be optimized.
+        device : "cuda" or "cpu"
+        num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+    """
+    model.eval()
+    cnt = 0
+    last_idx = len(valid_loader) - 1
+    val_sanity_start = time.time()
+
+    with torch.no_grad():
+        for batch_idx, (inputs, target) in enumerate(valid_loader):
+            last_batch = batch_idx == last_idx
+            # data_time_m.update(time.time() - batch_start)
+            inputs = inputs.to(device)
+            target = target.to(device)
+            output = model(inputs)
+
+            loss = criterion(output, target)
+            cnt += 1
+
+            if last_batch or batch_idx % log_interval == 0:
+                print(
+                    "Validation Sanity check passed for batch till {} batches".format(
+                        batch_idx
+                    )
+                )
+
+            if num_batches is not None:
+                if cnt >= num_batches:
+                    print("Sanity check passed till {} validation batches".format(cnt))
+                    print("All specicied batches done.")
+                    val_sanity_end = time.time()
+                    print(
+                        "Training Sanity check passed in time {} !!".format(
+                            val_sanity_end - val_sanity_start
+                        )
+                    )
+                    return True
+
+    val_sanity_end = time.time()
+    print(
+        "Training Sanity check passed in time {} !!".format(
+            val_sanity_end - val_sanity_start
+        )
+    )
+    return True
+
+
+def sanity_fit(
+    model,
+    train_loader,
+    valid_loader,
+    criterion,
+    device,
+    num_batches: int = None,
+    log_interval: int = 100,
+):
+    """
+    Performs Sanity fit over train loader and valid loader.
+    Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
+    It iterates over both train_loader and valid_loader for given batches.
+    Note: - It does not to loss.backward().
+    Args:
+        model : A pytorch CNN Model.
+        train_loader : Training loader.
+        val_loader : Validation loader.
+        criterion : Loss function to be optimized.
+        device : "cuda" or "cpu"
+        num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+    """
+    # Train sanity check
+    ts = train_sanity_fit(
+        model, train_loader, criterion, device, num_batches, log_interval
+    )
+    vs = val_sanity_fit(
+        model, valid_loader, criterion, device, num_batches, log_interval
+    )
+    # This line would run in case both pass otherwise it will create error naturally from torch.
+    return True

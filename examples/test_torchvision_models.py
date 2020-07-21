@@ -42,19 +42,19 @@ if __name__ == "__main__":
     # )
     all_supported_models = [
         "resnet18",
-        "resnet34",
-        "resnet50",
-        "resnet101",
-        "resnet152",
-        "resnext50_32x4d",
-        "resnext101_32x8d",
-        "vgg11",
-        "vgg13",
-        "vgg16",
-        "vgg19",
-        "mobilenet",
-        "mnasnet0_5",
-        "mnasnet1_0",
+        # "resnet34",
+        # "resnet50",
+        # "resnet101",
+        # "resnet152",
+        # "resnext50_32x4d",
+        # "resnext101_32x8d",
+        # "vgg11",
+        # "vgg13",
+        # "vgg16",
+        # "vgg19",
+        # "mobilenet",
+        # "mnasnet0_5",
+        # "mnasnet1_0",
     ]
 
     for model_name in all_supported_models:
@@ -79,15 +79,18 @@ if __name__ == "__main__":
         early_stopper = utils.EarlyStopping(
             patience=7, verbose=True, path=config.SAVE_PATH
         )
-        history = engine.fit(
-            epochs=2,
-            model=model,
-            train_loader=train_loader,
-            valid_loader=valid_loader,
-            criterion=criterion,
-            device=device,
-            optimizer=optimizer,
-            early_stopper=early_stopper,
+        # history = engine.fit(
+        #     epochs=2,
+        #     model=model,
+        #     train_loader=train_loader,
+        #     valid_loader=valid_loader,
+        #     criterion=criterion,
+        #     device=device,
+        #     optimizer=optimizer,
+        #     early_stopper=early_stopper,
+        # )
+        history = engine.sanity_fit(
+            model, train_loader, valid_loader, criterion, device, num_batches=10
         )
 
     print("Done !!")

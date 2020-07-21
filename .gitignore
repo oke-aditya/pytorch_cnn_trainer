@@ -1,3 +1,6 @@
+# Data folder
+data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.vscode
@@ -5,6 +8,7 @@ __pycache__/
 *$py.class
 *.pt
 *.pth
+
 
 # C extensions
 *.so
