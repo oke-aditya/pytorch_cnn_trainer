@@ -284,8 +284,20 @@ def train_sanity_fit(
     criterion,
     device,
     num_batches: int = None,
-    log_interval: int = 100,
-):
+    log_interval: int = 100,):
+    """
+    Performs Sanity fit over train loader.
+    Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
+    It iterates over both train_loader and valid_loader for given batches.
+    Note: - It does not to loss.backward().
+    Args:
+        model : A pytorch CNN Model.
+        train_loader : Train loader.
+        criterion : Loss function to be optimized.
+        device : "cuda" or "cpu"
+        num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+    """
     model.train()
     cnt = 0
     last_idx = len(train_loader) - 1
@@ -333,8 +345,20 @@ def val_sanity_fit(
     criterion,
     device,
     num_batches: int = None,
-    log_interval: int = 100,
-):
+    log_interval: int = 100,):
+    """
+    Performs Sanity fit over valid loader.
+    Use this to dummy check your fit function. It does not calculate metrics, timing, or does checkpointing.
+    It iterates over both train_loader and valid_loader for given batches.
+    Note: - It does not to loss.backward().
+    Args:
+        model : A pytorch CNN Model.
+        val_loader : Validation loader.
+        criterion : Loss function to be optimized.
+        device : "cuda" or "cpu"
+        num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+    """
     model.eval()
     cnt = 0
     last_idx = len(valid_loader) - 1
