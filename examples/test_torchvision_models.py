@@ -89,6 +89,8 @@ if __name__ == "__main__":
         #     optimizer=optimizer,
         #     early_stopper=early_stopper,
         # )
-        history = engine.santity_fit(model, train_loader, valid_loader, criterion, device, 128)
+        history = engine.santity_fit(
+            model, train_loader, valid_loader, criterion, device, 128
+        )
 
     print("Done !!")
