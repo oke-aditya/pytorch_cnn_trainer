@@ -22,7 +22,7 @@ import time
 # import model
 from collections import OrderedDict
 
-__all__ = ["train_step", "val_step", "fit"]
+__all__ = ["train_step", "val_step", "fit", "santity_fit"]
 
 
 def train_step(
