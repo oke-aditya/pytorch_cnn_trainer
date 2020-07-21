@@ -311,7 +311,9 @@ def sanity_fit(
         cnt += 1
 
         if last_batch or batch_idx % log_interval == 0:
-            print("Train Sanity check passed for batch till {} batches".format(batch_idx))
+            print(
+                "Train Sanity check passed for batch till {} batches".format(batch_idx)
+            )
 
         if num_batches is not None:
             if cnt >= num_batches:
@@ -341,8 +343,12 @@ def sanity_fit(
             loss = criterion(output, target)
             cnt += 1
 
-            if (last_batch or batch_idx % log_interval == 0):  
-                print("Validation Sanity check passed for batch till {} batches".format(batch_idx))
+            if last_batch or batch_idx % log_interval == 0:
+                print(
+                    "Validation Sanity check passed for batch till {} batches".format(
+                        batch_idx
+                    )
+                )
 
             if num_batches is not None:
                 if cnt >= num_batches:
