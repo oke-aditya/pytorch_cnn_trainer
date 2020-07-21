@@ -317,8 +317,9 @@ def sanity_fit(
 
         if num_batches is not None:
             if cnt >= num_batches:
-                print("Train Sanity check passed till {} batches".format(cnt))
-                break
+                print("Sanity check passed till {} train batches".format(cnt))
+                print("All specicied batches done.")
+            break
 
     train_sanity_end = time.time()
     print(
@@ -353,7 +354,8 @@ def sanity_fit(
             if num_batches is not None:
                 if cnt >= num_batches:
                     print("Sanity check passed till {} validation batches".format(cnt))
-                    break
+                    print("All specicied batches done.")
+                break
 
     val_sanity_end = time.time()
 
