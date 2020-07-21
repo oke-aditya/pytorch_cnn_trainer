@@ -45,7 +45,7 @@ Some examples that are provided.
 - [x] Quantization Aware Training head only.
 - [x] Quantization Aware Training Fully.
 
-# To Do: -
+# Features: -
 
 - [x] Support PyTorch image models (timm).
 - [x] Quantization Aware training example.
@@ -53,12 +53,7 @@ Some examples that are provided.
 - [x] Support torchvision models transfer learning.
 - [x] Add Keras Like fit method.
 - [x] Sanity Check code.
-- [ ] Add Support for multi label classification.
-- [ ] Add history like object as in Keras for plotting.
-- [ ] Other metrics such as precision, recall, f1, etc.
 - [x] Support torchvision quantized models transfer learning.
-- [ ] Mixed precision training using PyTorch 1.6
-- [ ] PyTorch Lightning Trainer with all these features.
 - [x] Add docstring, create package, etc.
 - [x] Minimal tests and examples.
 
