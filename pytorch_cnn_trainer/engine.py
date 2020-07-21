@@ -22,7 +22,7 @@ import time
 # import model
 from collections import OrderedDict
 
-__all__ = ["train_step", "val_step", "fit", "santity_fit"]
+__all__ = ["train_step", "val_step", "fit", "sanity_fit"]
 
 
 def train_step(
@@ -271,7 +271,7 @@ def fit(
     return True  # For now, we should probably return an history object like keras.
 
 
-def santity_fit(
+def sanity_fit(
     model,
     train_loader,
     valid_loader,
