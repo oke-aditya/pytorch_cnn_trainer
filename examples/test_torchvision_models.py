@@ -90,7 +90,7 @@ if __name__ == "__main__":
         #     early_stopper=early_stopper,
         # )
         history = engine.sanity_fit(
-            model, train_loader, valid_loader, criterion, device, 128
+            model, train_loader, valid_loader, criterion, device, num_batches=10
         )
 
     print("Done !!")

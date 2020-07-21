@@ -45,7 +45,7 @@ def train_step(
         optimizer : Torch optimizer to train.
         scheduler : Learning rate scheduler.
         num_batches : (optional) Integer To limit training to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
 
     start_train_step = time.time()
@@ -132,7 +132,7 @@ def val_step(
         criterion : Loss function to be optimized.
         device : "cuda" or "cpu"
         num_batches : (optional) Integer To limit validation to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
     start_test_step = time.time()
     last_idx = len(val_loader) - 1
@@ -236,7 +236,7 @@ def fit(
         scheduler : (optional) Learning Rate scheduler.
         early_stopper: (optional) A utils provied early stopper, based on validation loss.
         num_batches : (optional) Integer To limit validation to certain number of batches.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
     for epoch in tqdm(range(epochs)):
         print()
@@ -292,7 +292,7 @@ def sanity_fit(
         criterion : Loss function to be optimized.
         device : "cuda" or "cpu"
         num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
-        log_interval : (optional) Defualt 100. Integer to Log after specified batches.
+        log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
     # Train sanity check
     model.train()
@@ -310,14 +310,13 @@ def sanity_fit(
         loss = criterion(output, target)
         cnt += 1
 
-        if last_batch or batch_idx % log_interval == 0:  # If we reach the log interval
-            print(
-                "Train Sanity check passed for batch till {} batches".format(batch_idx)
-            )
+        if last_batch or batch_idx % log_interval == 0:
+            print("Train Sanity check passed for batch till {} batches".format(batch_idx))
 
         if num_batches is not None:
             if cnt >= num_batches:
-                print("Train Sanity check passed till {} batches".format(num_batches))
+                print("Train Sanity check passed till {} batches".format(cnt))
+                break
 
     train_sanity_end = time.time()
     print(
@@ -342,22 +341,13 @@ def sanity_fit(
             loss = criterion(output, target)
             cnt += 1
 
-            if (
-                last_batch or batch_idx % log_interval == 0
-            ):  # If we reach the log interval
-                print(
-                    "Validation Sanity check passed for batch till {} batches".format(
-                        batch_idx
-                    )
-                )
+            if (last_batch or batch_idx % log_interval == 0):  
+                print("Validation Sanity check passed for batch till {} batches".format(batch_idx))
 
             if num_batches is not None:
                 if cnt >= num_batches:
-                    print(
-                        "Sanity check passed till {} validation batches".format(
-                            num_batches
-                        )
-                    )
+                    print("Sanity check passed till {} validation batches".format(cnt))
+                    break
 
     val_sanity_end = time.time()
 
