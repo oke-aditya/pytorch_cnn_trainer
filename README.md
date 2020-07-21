@@ -39,7 +39,8 @@ Run the following in terminal, I will release on PyPI soon.
 ## Docs: -
 I have provided some example of how to use this trainer in multiple scenarios. Please check examples folder.
 Some examples that are provided.
-- [x] Fine Tune Torchvision models.
+- [x] Fine Tune Torchvision models using fit().
+- [x] Fine Tune Torchvision models using train_step() and validation_step().
 - [x] Fine Tune Ross Wightman's models.
 - [x] Quantization Aware Training head only.
 - [x] Quantization Aware Training Fully.
