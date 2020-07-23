@@ -2,44 +2,37 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import pytest
 from tqdm import tqdm
 import torchvision.transforms as T
 from pytorch_cnn_trainer import dataset
 from pytorch_cnn_trainer import model_factory
-import config
 from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import engine
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-if __name__ == "__main__":
-    print("Setting Seed for the run, seed = {}".format(config.SEED))
-    utils.seed_everything(config.SEED)
+
+def test_models():
+    # print("Setting Seed for the run, seed = {}".format(SEED))
+    # utils.seed_everything(SEED)
+    # We don't need seeds for tests
 
     print("Creating Train and Validation Dataset")
+    train_transforms = T.Compose([T.ToTensor(), T.Normalize((0.5,), (0.5,))])
+    valid_transforms = T.Compose([T.ToTensor(), T.Normalize((0.5,), (0.5,))])
+
     train_set, valid_set = dataset.create_cifar10_dataset(
-        config.train_transforms, config.valid_transforms
+        train_transforms, valid_transforms
     )
     print("Train and Validation Datasets Created")
 
     print("Creating DataLoaders")
-    train_loader, valid_loader = dataset.create_loaders(
-        train_set,
-        train_set,
-        config.TRAIN_BATCH_SIZE,
-        config.VALID_BATCH_SIZE,
-        config.NUM_WORKERS,
-    )
+    train_loader, valid_loader = dataset.create_loaders(train_set, train_set)
 
     print("Train and Validation Dataloaders Created")
     print("Creating Model")
 
-    # model = model.create_timm_model(
-    #     config.MODEL_NAME,
-    #     num_classes=config.NUM_ClASSES,
-    #     in_channels=config.IN_CHANNELS,
-    #     pretrained=config.PRETRAINED,
-    # )
     all_supported_models = [
         "resnet18",
         # "resnet34",
@@ -59,38 +52,27 @@ if __name__ == "__main__":
 
     for model_name in all_supported_models:
         model = model_factory.create_torchvision_model(
-            model_name, num_classes=config.NUM_ClASSES, pretrained=config.PRETRAINED,
-        )
+            model_name, num_classes=10, pretrained=False
+        )  # We don't need pretrained True, we just need a forward pass
 
         if torch.cuda.is_available():
             print("Model Created. Moving it to CUDA")
         else:
             print("Model Created. Training on CPU only")
         model.to(device)
-        optimizer = optim.Adam(model.parameters(), lr=config.LEARNING_RATE)
-
-        # Optionially a schedulear
-        # scheduler = optim.lr_scheduler.CyclicLR(optimizer=optimizer, base_lr=1e-4, max_lr=1e-3, mode="min")
+        optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
         criterion = (
             nn.CrossEntropyLoss()
         )  # All classification problems we need Cross entropy loss
 
-        early_stopper = utils.EarlyStopping(
-            patience=7, verbose=True, path=config.SAVE_PATH
-        )
-        # history = engine.fit(
-        #     epochs=2,
-        #     model=model,
-        #     train_loader=train_loader,
-        #     valid_loader=valid_loader,
-        #     criterion=criterion,
-        #     device=device,
-        #     optimizer=optimizer,
-        #     early_stopper=early_stopper,
+        # early_stopper = utils.EarlyStopping(
+        #     patience=7, verbose=True, path=SAVE_PATH
         # )
+        # We do not need early stopping too
         history = engine.sanity_fit(
             model, train_loader, valid_loader, criterion, device, num_batches=10
         )
 
     print("Done !!")
+    return 1
