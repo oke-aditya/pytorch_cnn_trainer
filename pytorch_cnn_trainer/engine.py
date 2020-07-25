@@ -41,6 +41,7 @@ def train_step(
     scheduler=None,
     num_batches: int = None,
     log_interval: int = 100,
+    grad_penalty: bool = False,
 ):
     """
     Performs one step of training. Calculates loss, forward pass, computes gradient and returns metrics.
@@ -53,6 +54,7 @@ def train_step(
         scheduler : Learning rate scheduler.
         num_batches : (optional) Integer To limit training to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+        grad_penalty : (optional) To penalize with l2 norm for big gradients.
     """
 
     start_train_step = time.time()
@@ -85,6 +87,18 @@ def train_step(
         top1_m.update(acc1.item(), output.size(0))
         top5_m.update(acc5.item(), output.size(0))
         losses_m.update(loss.item(), inputs.size(0))
+
+        if grad_penalty is True:
+            # Create gradients
+            grad_params = torch.autograd.grad(
+                loss, model.parameters(), create_graph=True
+            )
+            # Compute the L2 Norm as penalty and add that to loss
+            grad_norm = 0
+            for grad in grad_params:
+                grad_norm += grad.pow(2).sum()
+            grad_norm = grad_norm.sqrt()
+            loss = loss + grad_norm
 
         loss.backward()
         optimizer.step()
@@ -229,6 +243,7 @@ def fit(
     early_stopper=None,
     num_batches: int = None,
     log_interval: int = 100,
+    grad_penalty: bool = False,
 ):
     """
     A fit function that performs training for certain number of epochs.
@@ -257,6 +272,7 @@ def fit(
             scheduler,
             num_batches,
             log_interval,
+            grad_penalty,
         )
         print()
         print("Validating Epoch = {}".format(epoch))
@@ -268,10 +284,10 @@ def fit(
         if early_stopper is not None:
             early_stopper(validation_loss, model=model)
 
-        if early_stopper.early_stop:
-            print("Saving Model and Early Stopping")
-            print("Early Stopping. Ran out of Patience for validation loss")
-            break
+            if early_stopper.early_stop:
+                print("Saving Model and Early Stopping")
+                print("Early Stopping. Ran out of Patience for validation loss")
+                break
 
         print("Done Training, Model Saved to Disk")
 
@@ -285,6 +301,7 @@ def train_sanity_fit(
     device,
     num_batches: int = None,
     log_interval: int = 100,
+    grad_penalty: bool = False,
 ):
     """
     Performs Sanity fit over train loader.
@@ -312,6 +329,18 @@ def train_sanity_fit(
         output = model(inputs)
 
         loss = criterion(output, target)
+        if grad_penalty is True:
+            # Create gradients
+            grad_params = torch.autograd.grad(
+                loss, model.parameters(), create_graph=True
+            )
+            # Compute the L2 Norm as penalty and add that to loss
+            grad_norm = 0
+            for grad in grad_params:
+                grad_norm += grad.pow(2).sum()
+            grad_norm = grad_norm.sqrt()
+            loss = loss + grad_norm
+
         cnt += 1
 
         if last_batch or batch_idx % log_interval == 0:
@@ -413,6 +442,7 @@ def sanity_fit(
     device,
     num_batches: int = None,
     log_interval: int = 100,
+    grad_penalty: bool = False,
 ):
     """
     Performs Sanity fit over train loader and valid loader.

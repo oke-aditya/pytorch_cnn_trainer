@@ -71,7 +71,24 @@ def test_models():
         # )
         # We do not need early stopping too
         history = engine.sanity_fit(
-            model, train_loader, valid_loader, criterion, device, num_batches=10
+            model,
+            train_loader,
+            valid_loader,
+            criterion,
+            device,
+            num_batches=10,
+            grad_penalty=True,
+        )
+        history2 = engine.fit(
+            1,
+            model,
+            train_loader,
+            valid_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            grad_penalty=True,
         )
 
     print("Done !!")
