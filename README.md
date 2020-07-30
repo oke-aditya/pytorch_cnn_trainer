@@ -2,7 +2,10 @@
 
 ![Check Formatting](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Check%20Formatting/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![tests](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/tests/badge.svg)
+![CI Tests](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/CI%20Tests/badge.svg)
+![PyPi Release](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/PyPi%20Release/badge.svg)
+![Deploy mkdocs](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Deploy%20mkdocs/badge.svg)
+![Install Package](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Install%20Package/badge.svg)
 
 ## Train CNN for your task.
 
