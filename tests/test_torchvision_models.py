@@ -72,9 +72,16 @@ def test_models():
         # )
         # We do not need early stopping too
         scaler = amp.GradScaler()
-        
-        train_metrics = engine.train_step(model, train_loader, criterion, device, optimizer, 
-        num_batches=10, fp16_scaler=scaler)
+
+        train_metrics = engine.train_step(
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            fp16_scaler=scaler,
+        )
 
         history = engine.sanity_fit(
             model,

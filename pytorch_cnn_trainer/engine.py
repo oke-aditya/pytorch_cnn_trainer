@@ -46,7 +46,7 @@ def train_step(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
-    fp16_scaler = None,
+    fp16_scaler=None,
 ):
     """
     Performs one step of training. Calculates loss, forward pass, computes gradient and returns metrics.
@@ -299,7 +299,7 @@ def fit(
             num_batches,
             log_interval,
             grad_penalty,
-            fp16_scaler=scaler
+            fp16_scaler=scaler,
         )
         print()
         print("Validating Epoch = {}".format(epoch))
