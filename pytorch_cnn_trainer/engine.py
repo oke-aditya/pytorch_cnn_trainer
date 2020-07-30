@@ -12,9 +12,13 @@ Some Improvement I am trying to make
 3. Add torchvision support. (Done)
 4. fit() function (Done)
 5. Keras like history object. (TODO)
+6. Sanity Checker. (Done)
+7. Gradient Penalty. (Done)
+8. Mixed Precision Training. (Done)
 """
 
 import torch
+from torch.cuda import amp
 from pytorch_cnn_trainer import utils
 from tqdm import tqdm
 import time
@@ -42,6 +46,7 @@ def train_step(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
+    use_fp16: bool = False,
 ):
     """
     Performs one step of training. Calculates loss, forward pass, computes gradient and returns metrics.
@@ -55,6 +60,7 @@ def train_step(
         num_batches : (optional) Integer To limit training to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         grad_penalty : (optional) To penalize with l2 norm for big gradients.
+        use_fp16: (optional) If True uses PyTorch native mixed precision Training.
     """
 
     start_train_step = time.time()
@@ -70,6 +76,9 @@ def train_step(
     batch_start = time.time()
     # num_updates = epoch * len(loader)
 
+    if use_fp16 is True:
+        scaler = amp.GradScaler()
+
     for batch_idx, (inputs, target) in enumerate(train_loader):
         last_batch = batch_idx == last_idx
         # data_time_m.update(time.time() - batch_start)
@@ -78,33 +87,46 @@ def train_step(
 
         # zero the parameter gradients
         optimizer.zero_grad()
-        output = model(inputs)
 
-        loss = criterion(output, target)
+        if use_fp16 is True:
+            with amp.autocast():
+                output = model(inputs)
+                loss = criterion(output, target)
+                # Scale the loss using Grad Scaler
+                scaler.scale(loss).backward()
+                # Step using scaler.step()
+                scaler.step(optimizer)
+                # Update for next iteration
+                scaler.update()
+
+        else:
+            output = model(inputs)
+            loss = criterion(output, target)
+
+            if grad_penalty is True:
+                # Create gradients
+                grad_params = torch.autograd.grad(
+                    loss, model.parameters(), create_graph=True
+                )
+                # Compute the L2 Norm as penalty and add that to loss
+                grad_norm = 0
+                for grad in grad_params:
+                    grad_norm += grad.pow(2).sum()
+                grad_norm = grad_norm.sqrt()
+                loss = loss + grad_norm
+
+            loss.backward()
+            optimizer.step()
+
+        if scheduler is not None:
+            scheduler.step()
+
         cnt += 1
         acc1, acc5 = utils.accuracy(output, target, topk=(1, 5))
 
         top1_m.update(acc1.item(), output.size(0))
         top5_m.update(acc5.item(), output.size(0))
         losses_m.update(loss.item(), inputs.size(0))
-
-        if grad_penalty is True:
-            # Create gradients
-            grad_params = torch.autograd.grad(
-                loss, model.parameters(), create_graph=True
-            )
-            # Compute the L2 Norm as penalty and add that to loss
-            grad_norm = 0
-            for grad in grad_params:
-                grad_norm += grad.pow(2).sum()
-            grad_norm = grad_norm.sqrt()
-            loss = loss + grad_norm
-
-        loss.backward()
-        optimizer.step()
-
-        if scheduler is not None:
-            scheduler.step()
 
         batch_time_m.update(time.time() - batch_start)
         batch_start = time.time()
@@ -244,6 +266,7 @@ def fit(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
+    use_fp16: bool = False,
 ):
     """
     A fit function that performs training for certain number of epochs.
@@ -273,6 +296,7 @@ def fit(
             num_batches,
             log_interval,
             grad_penalty,
+            use_fp16,
         )
         print()
         print("Validating Epoch = {}".format(epoch))
@@ -302,6 +326,7 @@ def train_sanity_fit(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
+    use_fp16: bool = False,
 ):
     """
     Performs Sanity fit over train loader.
@@ -315,11 +340,15 @@ def train_sanity_fit(
         device : "cuda" or "cpu"
         num_batches : (optional) Integer To limit sanity fit over certain batches. Useful is data is too big even for sanity check.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+        use_fp16: : (optional) If True uses PyTorch native mixed precision Training.
     """
     model.train()
     cnt = 0
     last_idx = len(train_loader) - 1
     train_sanity_start = time.time()
+
+    if use_fp16 is True:
+        scaler = amp.GradScaler()
 
     for batch_idx, (inputs, target) in enumerate(train_loader):
         last_batch = batch_idx == last_idx
@@ -328,18 +357,24 @@ def train_sanity_fit(
         target = target.to(device)
         output = model(inputs)
 
-        loss = criterion(output, target)
-        if grad_penalty is True:
-            # Create gradients
-            grad_params = torch.autograd.grad(
-                loss, model.parameters(), create_graph=True
-            )
-            # Compute the L2 Norm as penalty and add that to loss
-            grad_norm = 0
-            for grad in grad_params:
-                grad_norm += grad.pow(2).sum()
-            grad_norm = grad_norm.sqrt()
-            loss = loss + grad_norm
+        if use_fp16 is True:
+            with amp.autocast():
+                output = model(inputs)
+                loss = criterion(output, target)
+
+        else:
+            loss = criterion(output, target)
+            if grad_penalty is True:
+                # Create gradients
+                grad_params = torch.autograd.grad(
+                    loss, model.parameters(), create_graph=True
+                )
+                # Compute the L2 Norm as penalty and add that to loss
+                grad_norm = 0
+                for grad in grad_params:
+                    grad_norm += grad.pow(2).sum()
+                grad_norm = grad_norm.sqrt()
+                loss = loss + grad_norm
 
         cnt += 1
 
@@ -443,6 +478,7 @@ def sanity_fit(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
+    use_fp16: bool = False,
 ):
     """
     Performs Sanity fit over train loader and valid loader.
@@ -460,7 +496,14 @@ def sanity_fit(
     """
     # Train sanity check
     ts = train_sanity_fit(
-        model, train_loader, criterion, device, num_batches, log_interval
+        model,
+        train_loader,
+        criterion,
+        device,
+        num_batches,
+        log_interval,
+        grad_penalty,
+        use_fp16,
     )
     vs = val_sanity_fit(
         model, valid_loader, criterion, device, num_batches, log_interval

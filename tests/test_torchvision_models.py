@@ -78,6 +78,7 @@ def test_models():
             device,
             num_batches=10,
             grad_penalty=True,
+            # use_fp16=True,
         )
         history2 = engine.fit(
             1,
@@ -88,7 +89,8 @@ def test_models():
             device,
             optimizer,
             num_batches=10,
-            grad_penalty=True,
+            # grad_penalty=True,
+            use_fp16=True,
         )
 
     print("Done !!")
