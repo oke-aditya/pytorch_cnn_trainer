@@ -90,11 +90,29 @@ def train_step(
                 output = model(inputs)
                 loss = criterion(output, target)
                 # Scale the loss using Grad Scaler
-                fp16_scaler.scale(loss).backward()
-                # Step using fp16_scaler.step()
-                fp16_scaler.step(optimizer)
-                # Update for next iteration
-                fp16_scaler.update()
+
+            if grad_penalty is True:
+                # Scales the loss for autograd.grad's backward pass, resulting in scaled grad_params
+                scaled_grad_params = torch.autograd.grad(fp16_scaler.scale(loss), model.parameters(), create_graph=True)
+                # Creates unscaled grad_params before computing the penalty. scaled_grad_params are
+                # not owned by any optimizer, so ordinary division is used instead of fp16_scaler.unscale_:
+                inv_scale = 1. / fp16_scaler.get_scale()
+                grad_params = [p * inv_scale for p in scaled_grad_params]
+                # Computes the penalty term and adds it to the loss
+                with amp.autocast():
+                    grad_norm = 0
+                    for grad in grad_params:
+                        grad_norm += grad.pow(2).sum()
+                    
+                    grad_norm = grad_norm.sqrt()
+                    loss = loss + grad_norm
+
+            fp16_scaler.scale(loss).backward()
+            # Step using fp16_scaler.step()
+            fp16_scaler.step(optimizer)
+            # Update for next iteration
+            fp16_scaler.update()
+
 
         else:
             output = model(inputs)
