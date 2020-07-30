@@ -1,6 +1,0 @@
-scikit_learn
-tqdm
-timm
-matplotlib
-numpy
-pytorch_lightning
