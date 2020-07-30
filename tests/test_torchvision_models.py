@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from torch.cuda import amp
 import pytest
 from tqdm import tqdm
 import torchvision.transforms as T
@@ -70,6 +71,18 @@ def test_models():
         #     patience=7, verbose=True, path=SAVE_PATH
         # )
         # We do not need early stopping too
+        scaler = amp.GradScaler()
+
+        train_metrics = engine.train_step(
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            fp16_scaler=scaler,
+        )
+
         history = engine.sanity_fit(
             model,
             train_loader,
@@ -88,7 +101,8 @@ def test_models():
             device,
             optimizer,
             num_batches=10,
-            grad_penalty=True,
+            # grad_penalty=True,
+            use_fp16=True,
         )
 
     print("Done !!")
