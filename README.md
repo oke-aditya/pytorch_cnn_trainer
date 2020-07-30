@@ -7,7 +7,7 @@
 ![Deploy mkdocs](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Deploy%20mkdocs/badge.svg)
 ![Install Package](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Install%20Package/badge.svg)
 
-## Train CNN for your task.
+## Train CNN for your task
 
 A simple engine to fine tune CNNs from [torchvision](https://github.com/pytorch/vision) and [Pytorch Image models](https://github.com/rwightman/pytorch-image-models) from Ross Wightman.
 
