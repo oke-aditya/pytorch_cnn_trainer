@@ -1,4 +1,4 @@
-site_name: Python Template Repository Docs
+site_name: PyTorch CNN Trainer
 theme:
   name: "material"
   palette:
