@@ -279,10 +279,13 @@ def fit(
         early_stopper: (optional) A utils provied early stopper, based on validation loss.
         num_batches : (optional) Integer To limit validation to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
+        use_fp16 : (optional) To use Mixed Precision Training using float16 dtype.
     """
     if use_fp16 is True:
         print("Training with Mixed precision fp16 scaler")
         scaler = amp.GradScaler()
+    else:
+        scaler = None
     for epoch in tqdm(range(epochs)):
         print()
         print("Training Epoch = {}".format(epoch))
