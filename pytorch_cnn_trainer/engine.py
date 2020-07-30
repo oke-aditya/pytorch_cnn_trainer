@@ -46,7 +46,7 @@ def train_step(
     num_batches: int = None,
     log_interval: int = 100,
     grad_penalty: bool = False,
-    use_fp16: bool = False,
+    fp16_scaler = None,
 ):
     """
     Performs one step of training. Calculates loss, forward pass, computes gradient and returns metrics.
@@ -60,7 +60,7 @@ def train_step(
         num_batches : (optional) Integer To limit training to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         grad_penalty : (optional) To penalize with l2 norm for big gradients.
-        use_fp16: (optional) If True uses PyTorch native mixed precision Training.
+        fp16_scaler: (optional) If True uses PyTorch native mixed precision Training.
     """
 
     start_train_step = time.time()
@@ -76,9 +76,6 @@ def train_step(
     batch_start = time.time()
     # num_updates = epoch * len(loader)
 
-    if use_fp16 is True:
-        scaler = amp.GradScaler()
-
     for batch_idx, (inputs, target) in enumerate(train_loader):
         last_batch = batch_idx == last_idx
         # data_time_m.update(time.time() - batch_start)
@@ -88,16 +85,16 @@ def train_step(
         # zero the parameter gradients
         optimizer.zero_grad()
 
-        if use_fp16 is True:
+        if fp16_scaler is not None:
             with amp.autocast():
                 output = model(inputs)
                 loss = criterion(output, target)
                 # Scale the loss using Grad Scaler
-                scaler.scale(loss).backward()
-                # Step using scaler.step()
-                scaler.step(optimizer)
+                fp16_scaler.scale(loss).backward()
+                # Step using fp16_scaler.step()
+                fp16_scaler.step(optimizer)
                 # Update for next iteration
-                scaler.update()
+                fp16_scaler.update()
 
         else:
             output = model(inputs)
@@ -283,6 +280,9 @@ def fit(
         num_batches : (optional) Integer To limit validation to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
     """
+    if use_fp16 is True:
+        print("Training with Mixed precision fp16 scaler")
+        scaler = amp.GradScaler()
     for epoch in tqdm(range(epochs)):
         print()
         print("Training Epoch = {}".format(epoch))
@@ -296,7 +296,7 @@ def fit(
             num_batches,
             log_interval,
             grad_penalty,
-            use_fp16,
+            fp16_scaler=scaler
         )
         print()
         print("Validating Epoch = {}".format(epoch))
