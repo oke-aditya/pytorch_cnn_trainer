@@ -71,16 +71,35 @@ def test_models():
         #     patience=7, verbose=True, path=SAVE_PATH
         # )
         # We do not need early stopping too
-        scaler = amp.GradScaler()
+
+        if torch.cuda.is_available():
+            scaler = amp.GradScaler()
+
+            train_metrics = engine.train_step(
+                model,
+                train_loader,
+                criterion,
+                device,
+                optimizer,
+                num_batches=10,
+                fp16_scaler=scaler,
+            )
+
+            history2 = engine.fit(
+                1,
+                model,
+                train_loader,
+                valid_loader,
+                criterion,
+                device,
+                optimizer,
+                num_batches=10,
+                grad_penalty=True,
+                use_fp16=True,
+            )
 
         train_metrics = engine.train_step(
-            model,
-            train_loader,
-            criterion,
-            device,
-            optimizer,
-            num_batches=10,
-            fp16_scaler=scaler,
+            model, train_loader, criterion, device, optimizer, num_batches=10,
         )
 
         history = engine.sanity_fit(
@@ -92,6 +111,7 @@ def test_models():
             num_batches=10,
             grad_penalty=True,
         )
+
         history2 = engine.fit(
             1,
             model,
@@ -102,7 +122,6 @@ def test_models():
             optimizer,
             num_batches=10,
             grad_penalty=True,
-            use_fp16=False,
         )
 
     print("Done !!")

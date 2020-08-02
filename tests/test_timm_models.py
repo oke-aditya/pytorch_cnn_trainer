@@ -6,6 +6,7 @@ import pytest
 from tqdm import tqdm
 import timm
 import torchvision.transforms as T
+from torch.cuda import amp
 from pytorch_cnn_trainer import dataset
 from pytorch_cnn_trainer import model_factory
 from pytorch_cnn_trainer import utils
@@ -54,7 +55,36 @@ def test_models():
         nn.CrossEntropyLoss()
     )  # All classification problems we need Cross entropy loss.
 
-    # We do not need early stopping too
+    if torch.cuda.is_available():
+        scaler = amp.GradScaler()
+
+        train_metrics = engine.train_step(
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            fp16_scaler=scaler,
+        )
+
+        history2 = engine.fit(
+            1,
+            model,
+            train_loader,
+            valid_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            grad_penalty=True,
+            use_fp16=True,
+        )
+
+    train_metrics = engine.train_step(
+        model, train_loader, criterion, device, optimizer, num_batches=10,
+    )
+
     history = engine.sanity_fit(
         model,
         train_loader,
@@ -76,5 +106,6 @@ def test_models():
         num_batches=10,
         grad_penalty=True,
     )
+
     print("Done")
     return 1
