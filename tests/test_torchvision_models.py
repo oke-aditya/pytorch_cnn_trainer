@@ -102,7 +102,7 @@ def test_models():
             optimizer,
             num_batches=10,
             grad_penalty=True,
-            use_fp16=True,
+            use_fp16=False,
         )
 
     print("Done !!")
