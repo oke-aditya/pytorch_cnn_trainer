@@ -60,7 +60,7 @@ def train_step(
         num_batches : (optional) Integer To limit training to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         grad_penalty : (optional) To penalize with l2 norm for big gradients.
-        fp16_scaler: (optional) If True uses PyTorch native mixed precision Training.
+        fp16_scaler: (optional)  Pass torch.cuda.amp.GradScaler() for fp16 precision Training.
     """
 
     start_train_step = time.time()
@@ -283,6 +283,8 @@ def fit(
     log_interval: int = 100,
     grad_penalty: bool = False,
     use_fp16: bool = False,
+    swa_start: int = None,
+    swa_scheduler=None,
 ):
     """
     A fit function that performs training for certain number of epochs.
@@ -300,26 +302,50 @@ def fit(
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         use_fp16 : (optional) To use Mixed Precision Training using float16 dtype.
     """
+
+    if swa_start is not None:
+        swa_model = torch.optim.swa_utils.AveragedModel(model)
+
     if use_fp16 is True:
         print("Training with Mixed precision fp16 scaler")
         scaler = amp.GradScaler()
     else:
         scaler = None
+
     for epoch in tqdm(range(epochs)):
         print()
         print("Training Epoch = {}".format(epoch))
-        train_metrics = train_step(
-            model,
-            train_loader,
-            criterion,
-            device,
-            optimizer,
-            scheduler,
-            num_batches,
-            log_interval,
-            grad_penalty,
-            fp16_scaler=scaler,
-        )
+        if epoch > swa_start:
+            train_metrics = train_step(
+                model,
+                train_loader,
+                criterion,
+                device,
+                optimizer,
+                scheduler=None,
+                num_batches=num_batches,
+                log_interval=log_interval,
+                grad_penalty=grad_penalty,
+                fp16_scaler=scaler,
+            )
+
+            swa_model.update_parameters(model)
+            swa_scheduler.step()
+
+        else:
+            train_metrics = train_step(
+                model,
+                train_loader,
+                criterion,
+                device,
+                optimizer,
+                scheduler,
+                num_batches,
+                log_interval,
+                grad_penalty,
+                fp16_scaler=scaler,
+            )
+
         print()
         print("Validating Epoch = {}".format(epoch))
         valid_metrics = val_step(

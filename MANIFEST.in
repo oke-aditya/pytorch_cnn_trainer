@@ -1,6 +1,22 @@
-include CONTRIBUTING.md
-include LICENSE
-include README.md
+include *.md
 include settings.ini
-include CODE_OF_CONDUCT.md
+
+# Exclude build configs
+exclude *.yml
+exclude *.yaml
+
+# exclude tests from package
+recursive-exclude tests *
+recursive-exclude site *
+exclude tests
+
+# Exclude the documentation files
+recursive-exclude docs *
+exclude docs
+
+# Prune Git / GitHub stuff
+prune .git
+prune .github
+
+recursive-exclude * __pycache__ 
 recursive-exclude * __pycache_
