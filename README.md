@@ -48,18 +48,24 @@ Some examples that are provided.
 - [x] Fine Tune Ross Wightman's models.
 - [x] Quantization Aware Training head only.
 - [x] Quantization Aware Training Fully.
+- [ ] Mixed Precision Training
+- [ ] Training with Stochastic Weighted Average (SWA)
+- [ ] LR Finder implementation
 
 # Features: -
 
-- [x] Support PyTorch image models (timm).
+- [x] Support PyTorch image models (timm) training and transfer learning.
 - [x] Quantization Aware training example.
 - [x] Early stopping with patience.
-- [x] Support torchvision models transfer learning.
-- [x] Add Keras Like fit method.
-- [x] Sanity Check code.
+- [x] Support torchvision models trainging and transfer learning.
 - [x] Support torchvision quantized models transfer learning.
-- [x] Add docstring, create package, etc.
-- [x] Minimal tests and examples.
+- [x] Support for Mixed Precision Training.
+- [x] L2 Norm Gradient Penalty.
+- [ ] LR Finder Implementation.
+- [x] SWA Stochastic weighted Averaging support for training.
+- [x] Add Keras Like fit method.
+- [x] Sanity Check method.
+
 
 Hope this repo helps people to train models using transfer learning. 
 

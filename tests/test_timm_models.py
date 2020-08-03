@@ -6,10 +6,12 @@ import pytest
 from tqdm import tqdm
 import timm
 import torchvision.transforms as T
+from torch.cuda import amp
 from pytorch_cnn_trainer import dataset
 from pytorch_cnn_trainer import model_factory
 from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import engine
+from torch.optim.swa_utils import SWALR
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -52,9 +54,50 @@ def test_models():
 
     criterion = (
         nn.CrossEntropyLoss()
-    )  # All classification problems we need Cross entropy loss.
+    )  # All classification problems we need Cross entropy loss
 
+    # early_stopper = utils.EarlyStopping(
+    #     patience=7, verbose=True, path=SAVE_PATH
+    # )
     # We do not need early stopping too
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=300)
+
+    swa_scheduler = SWALR(
+        optimizer, anneal_strategy="linear", anneal_epochs=20, swa_lr=0.05
+    )
+    swa_start = 2
+
+    if torch.cuda.is_available():
+        scaler = amp.GradScaler()
+
+        train_metrics = engine.train_step(
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            fp16_scaler=scaler,
+        )
+
+        history2 = engine.fit(
+            1,
+            model,
+            train_loader,
+            valid_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
+            grad_penalty=True,
+            use_fp16=True,
+        )
+
+    train_metrics = engine.train_step(
+        model, train_loader, criterion, device, optimizer, num_batches=10,
+    )
+
     history = engine.sanity_fit(
         model,
         train_loader,
@@ -76,5 +119,21 @@ def test_models():
         num_batches=10,
         grad_penalty=True,
     )
-    print("Done")
+
+    history3 = engine.fit(
+        3,
+        model,
+        train_loader,
+        valid_loader,
+        criterion,
+        device,
+        optimizer,
+        scheduler=scheduler,
+        num_batches=10,
+        grad_penalty=True,
+        swa_start=swa_start,
+        swa_scheduler=swa_scheduler,
+    )
+
+    print("Done !!")
     return 1
