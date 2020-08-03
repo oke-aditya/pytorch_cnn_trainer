@@ -53,7 +53,19 @@ def test_models():
 
     criterion = (
         nn.CrossEntropyLoss()
-    )  # All classification problems we need Cross entropy loss.
+    )  # All classification problems we need Cross entropy loss
+
+    # early_stopper = utils.EarlyStopping(
+    #     patience=7, verbose=True, path=SAVE_PATH
+    # )
+    # We do not need early stopping too
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=300)
+
+    swa_scheduler = torch.optim.swa_utils.SWALR(
+        optimizer, anneal_strategy="linear", anneal_epochs=20, swa_lr=0.05
+    )
+    swa_start = 2
 
     if torch.cuda.is_available():
         scaler = amp.GradScaler()
@@ -107,5 +119,20 @@ def test_models():
         grad_penalty=True,
     )
 
-    print("Done")
+    history3 = engine.fit(
+        3,
+        model,
+        train_loader,
+        valid_loader,
+        criterion,
+        device,
+        optimizer,
+        scheduler=scheduler,
+        num_batches=10,
+        grad_penalty=True,
+        swa_start=swa_start,
+        swa_scheduler=swa_scheduler,
+    )
+
+    print("Done !!")
     return 1

@@ -302,7 +302,7 @@ def fit(
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         use_fp16 : (optional) To use Mixed Precision Training using float16 dtype.
         swa_start : (optional) To use Stochastic Weighted Averaging while Training
-        swa_scheduler : (optional) A torch.optim.scheduler to be used during SWA Training epochs.
+        swa_scheduler : (optional) A torch.optim.swa_utils.scheduler to be used during SWA Training epochs.
     """
 
     if swa_start is not None:
