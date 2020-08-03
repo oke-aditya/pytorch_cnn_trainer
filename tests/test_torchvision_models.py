@@ -10,6 +10,7 @@ from pytorch_cnn_trainer import dataset
 from pytorch_cnn_trainer import model_factory
 from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import engine
+from torch.optim.swa_utils import SWALR
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -74,7 +75,7 @@ def test_models():
 
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=300)
 
-        swa_scheduler = torch.optim.swa_utils.SWALR(
+        swa_scheduler = SWALR(
             optimizer, anneal_strategy="linear", anneal_epochs=20, swa_lr=0.05
         )
         swa_start = 2
