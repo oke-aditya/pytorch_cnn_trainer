@@ -301,10 +301,13 @@ def fit(
         num_batches : (optional) Integer To limit validation to certain number of batches.
         log_interval : (optional) Defualt 100. Integer to Log after specified batch ids in every batch.
         use_fp16 : (optional) To use Mixed Precision Training using float16 dtype.
+        swa_start : (optional) To use Stochastic Weighted Averaging while Training
+        swa_scheduler : (optional) A torch.optim.scheduler to be used during SWA Training epochs.
     """
 
     if swa_start is not None:
         swa_model = torch.optim.swa_utils.AveragedModel(model)
+        print("Training with Stochastic Weighted averaging (SWA) Scheduler")
 
     if use_fp16 is True:
         print("Training with Mixed precision fp16 scaler")
@@ -315,22 +318,37 @@ def fit(
     for epoch in tqdm(range(epochs)):
         print()
         print("Training Epoch = {}".format(epoch))
-        if epoch > swa_start:
-            train_metrics = train_step(
-                model,
-                train_loader,
-                criterion,
-                device,
-                optimizer,
-                scheduler=None,
-                num_batches=num_batches,
-                log_interval=log_interval,
-                grad_penalty=grad_penalty,
-                fp16_scaler=scaler,
-            )
+        if swa_start is not None:
+            if epoch > swa_start:
+                train_metrics = train_step(
+                    model,
+                    train_loader,
+                    criterion,
+                    device,
+                    optimizer,
+                    scheduler=None,
+                    num_batches=num_batches,
+                    log_interval=log_interval,
+                    grad_penalty=grad_penalty,
+                    fp16_scaler=scaler,
+                )
 
-            swa_model.update_parameters(model)
-            swa_scheduler.step()
+                swa_model.update_parameters(model)
+                swa_scheduler.step()
+
+            else:
+                train_metrics = train_step(
+                    model,
+                    train_loader,
+                    criterion,
+                    device,
+                    optimizer,
+                    scheduler,
+                    num_batches,
+                    log_interval,
+                    grad_penalty,
+                    fp16_scaler=scaler,
+                )
 
         else:
             train_metrics = train_step(
