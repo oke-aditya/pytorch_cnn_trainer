@@ -34,10 +34,15 @@ It will train on multiple GPUs just the way lightning supports (soon).
 ## To install 
 
 Install torch and torchvision from [PyTorch](https://pytorch.org/)
-Run the following in terminal, I will release on PyPI soon.
+Run the following in terminal.
 
 ```
-! pip install -q git+git://github.com/oke-aditya/pytorch_cnn_trainer.git
+pip install -q git+git://github.com/oke-aditya/pytorch_cnn_trainer.git
+```
+Or from PyPI now !!
+
+```
+pip install pytorch_cnn_trainer
 ```
 
 ## Docs: -
