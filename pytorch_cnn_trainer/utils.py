@@ -11,7 +11,15 @@ __all__ = [
     "EarlyStopping",
     "matplotlib_imshow",
     "print_size_of_model",
+    "set_debug_apis",
 ]
+
+
+def set_debug_apis(state: bool = False):
+    torch.autograd.profiler.profile(enabled=state)
+    torch.autograd.profiler.emit_nvtx(enabled=state)
+    torch.autograd.set_detect_anomaly(mode=state)
+    # torch.autograd.gradcheck()
 
 
 def seed_everything(seed):
@@ -81,7 +89,7 @@ class EarlyStopping:
         Args:
             patience (int): How long to wait after last time validation loss improved.
                             Default: 7
-            verbose (bool): If True, prints a message for each validation loss improvement. 
+            verbose (bool): If True, prints a message for each validation loss improvement.
                             Default: False
             delta (float): Minimum change in the monitored quantity to qualify as an improvement.
                             Default: 0

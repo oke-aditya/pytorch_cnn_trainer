@@ -107,7 +107,12 @@ def test_models():
             )
 
         train_metrics = engine.train_step(
-            model, train_loader, criterion, device, optimizer, num_batches=10,
+            model,
+            train_loader,
+            criterion,
+            device,
+            optimizer,
+            num_batches=10,
         )
 
         history = engine.sanity_fit(

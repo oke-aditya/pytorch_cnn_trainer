@@ -20,7 +20,7 @@ if __name__ == "__main__":
     PRETRAINED = True  # If True -> Fine Tuning else Scratch Training
     EPOCHS = 5
     EARLY_STOPPING = True  # If you need early stoppoing for validation loss
-    SAVE_PATH = "{}.pt".format(MODEL_NAME)
+    SAVE_PATH = f"{MODEL_NAME}.pt"
     SEED = 42
 
     # Train and validation Transforms which you would like
@@ -28,12 +28,10 @@ if __name__ == "__main__":
     valid_transforms = T.Compose([T.ToTensor(), T.Normalize((0.5,), (0.5,))])
 
     utils.seed_everything(SEED)
-    print("Setting Seed for the run, seed = {}".format(SEED))
+    print(f"Setting Seed for the run, seed = {config.SEED}")
 
     print("Creating Train and Validation Dataset")
-    train_set, valid_set = dataset.create_cifar10_dataset(
-        train_transforms, valid_transforms
-    )
+    train_set, valid_set = dataset.create_cifar10_dataset(train_transforms, valid_transforms)
     print("Train and Validation Datasets Created")
 
     print("Creating DataLoaders")
@@ -41,29 +39,25 @@ if __name__ == "__main__":
     print("Train and Validation Dataloaders Created")
 
     print("Creating Model")
-    model = model_factory.create_torchvision_model(
-        MODEL_NAME, num_classes=NUM_ClASSES, pretrained=True
-    )
+    model = model_factory.create_torchvision_model(MODEL_NAME, num_classes=NUM_ClASSES, pretrained=True)
+    
     if torch.cuda.is_available():
         print("Model Created. Moving it to CUDA")
     else:
         print("Model Created. Training on CPU only")
     model.to(device)
+
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    criterion = (
-        nn.CrossEntropyLoss()
-    )  # All classification problems we need Cross entropy loss
+    criterion = (nn.CrossEntropyLoss())  # All classification problems we need Cross entropy loss
     early_stopper = utils.EarlyStopping(patience=7, verbose=True, path=SAVE_PATH)
 
     for epoch in tqdm(range(EPOCHS)):
         print()
-        print("Training Epoch = {}".format(epoch))
-        train_metrics = engine.train_step(
-            model, train_loader, criterion, device, optimizer
-        )
+        print(f"Training Epoch = {epoch}")
+        train_metrics = engine.train_step(model, train_loader, criterion, device, optimizer)
         print()
-        print("Validating Epoch = {}".format(epoch))
+        print(f"Validating Epoch = {epoch}")
         valid_metrics = engine.val_step(model, valid_loader, criterion, device)
         validation_loss = valid_metrics["loss"]
         early_stopper(validation_loss, model=model)

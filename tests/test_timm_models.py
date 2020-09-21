@@ -42,7 +42,10 @@ def test_models():
     # Right method and complete check would be
     # for model in timm.list_models() and then do this. It willl go out of github actions limits.
     model = model_factory.create_timm_model(
-        MODEL_NAME, num_classes=10, in_channels=3, pretrained=False,
+        MODEL_NAME,
+        num_classes=10,
+        in_channels=3,
+        pretrained=False,
     )
 
     if torch.cuda.is_available():
@@ -95,7 +98,12 @@ def test_models():
         )
 
     train_metrics = engine.train_step(
-        model, train_loader, criterion, device, optimizer, num_batches=10,
+        model,
+        train_loader,
+        criterion,
+        device,
+        optimizer,
+        num_batches=10,
     )
 
     history = engine.sanity_fit(

@@ -10,7 +10,10 @@ __all__ = ["create_timm_model", "create_torchvision_model", "fine_tune_torchvisi
 
 
 def create_timm_model(
-    model_name: str, num_classes: int, in_channels: int = 3, pretrained: bool = True,
+    model_name: str,
+    num_classes: int,
+    in_channels: int = 3,
+    pretrained: bool = True,
 ):
     """
     Creates a model from PyTorch Image Models repository.
@@ -166,7 +169,9 @@ class fine_tune_torchvision(nn.Module):
 # Wrapper function for consistency with timm models
 # We do not pass in_channels here since torchvision models is not supported with it.
 def create_torchvision_model(
-    model_name: str, num_classes: int, pretrained: bool = True,
+    model_name: str,
+    num_classes: int,
+    pretrained: bool = True,
 ):
     """
     Creates CNN model from Torchvision. It replaces the top classification layer with num_classes you need.

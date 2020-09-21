@@ -6,7 +6,6 @@ https://github.com/rwightman/pytorch-image-models/blob/master/train.py
 https://github.com/pytorch/examples/tree/master/imagenet
 This is just simplified version of both of them, trying to provide flexibility and modularity.
 
-Some Improvement I am trying to make
 1. Support mixed precision training with PyTorch 1.6 (soon).
 2. Early Stopping. (Done)
 3. Add torchvision support. (Done)
@@ -93,9 +92,7 @@ def train_step(
 
             if grad_penalty is True:
                 # Scales the loss for autograd.grad's backward pass, resulting in scaled grad_params
-                scaled_grad_params = torch.autograd.grad(
-                    fp16_scaler.scale(loss), model.parameters(), create_graph=True
-                )
+                scaled_grad_params = torch.autograd.grad(fp16_scaler.scale(loss), model.parameters(), create_graph=True)
                 # Creates unscaled grad_params before computing the penalty. scaled_grad_params are
                 # not owned by any optimizer, so ordinary division is used instead of fp16_scaler.unscale_:
                 inv_scale = 1.0 / fp16_scaler.get_scale()
@@ -121,9 +118,7 @@ def train_step(
 
             if grad_penalty is True:
                 # Create gradients
-                grad_params = torch.autograd.grad(
-                    loss, model.parameters(), create_graph=True
-                )
+                grad_params = torch.autograd.grad(loss, model.parameters(), create_graph=True)
                 # Compute the L2 Norm as penalty and add that to loss
                 grad_norm = 0
                 for grad in grad_params:
@@ -162,21 +157,13 @@ def train_step(
                 metrics = OrderedDict(
                     [("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg)]
                 )
-                print("Done till {} train batches".format(num_batches))
-                print(
-                    "Time taken for train step = {} sec".format(
-                        end_train_step - start_train_step
-                    )
-                )
+                print(f"Done till {num_batches} train batches")
+                print(f"Time taken for train step = {end_train_step - start_train_step} sec")
                 return metrics
 
-    metrics = OrderedDict(
-        [("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg)]
-    )
+    metrics = OrderedDict([("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg)])
     end_train_step = time.time()
-    print(
-        "Time taken for train step = {} sec".format(end_train_step - start_train_step)
-    )
+    print(f"Time taken for train step = {end_train_step - start_train_step} sec")
     return metrics
 
 
@@ -233,39 +220,21 @@ def val_step(
                     "Loss: {loss.val:>7.4f} ({loss.avg:>6.4f})  "
                     "Top 1 Accuracy: {top1.val:>7.4f} ({top1.avg:>7.4f})  "
                     "Top 5 Accuracy: {top5.val:>7.4f} ({top5.avg:>7.4f})".format(
-                        batch_time=batch_time_m, loss=losses_m, top1=top1_m, top5=top5_m
-                    )
-                )
+                        batch_time=batch_time_m, loss=losses_m, top1=top1_m, top5=top5_m))
 
             if num_batches is not None:
                 if cnt >= num_batches:
                     end_test_step = time.time()
-                    metrics = OrderedDict(
-                        [
-                            ("loss", losses_m.avg),
-                            ("top1", top1_m.avg),
-                            ("top5", top5_m.avg),
-                        ]
-                    )
-                    print("Done till {} validation batches".format(num_batches))
-                    print(
-                        "Time taken for validation step = {} sec".format(
-                            end_test_step - start_test_step
-                        )
-                    )
+                    metrics = OrderedDict([("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg),])
+                    print(f"Done till {num_batches} validation batches")
+                    print(f"Time taken for validation step = {end_test_step - start_test_step} sec")
                     return metrics
 
-        metrics = OrderedDict(
-            [("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg)]
-        )
+        metrics = OrderedDict([("loss", losses_m.avg), ("top1", top1_m.avg), ("top5", top5_m.avg)])
         print("Finished the validation epoch")
 
     end_test_step = time.time()
-    print(
-        "Time taken for validation step = {} sec".format(
-            end_test_step - start_test_step
-        )
-    )
+    print(f"Time taken for validation step = {end_test_step - start_test_step} sec")
     return metrics
 
 
@@ -317,7 +286,7 @@ def fit(
 
     for epoch in tqdm(range(epochs)):
         print()
-        print("Training Epoch = {}".format(epoch))
+        print(f"Training Epoch = {epoch}")
         if swa_start is not None:
             if epoch > swa_start:
                 train_metrics = train_step(
@@ -365,10 +334,8 @@ def fit(
             )
 
         print()
-        print("Validating Epoch = {}".format(epoch))
-        valid_metrics = val_step(
-            model, valid_loader, criterion, device, num_batches, log_interval
-        )
+        print(f"Validating Epoch = {epoch}")
+        valid_metrics = val_step(model, valid_loader, criterion, device, num_batches, log_interval)
 
         validation_loss = valid_metrics["loss"]
         if early_stopper is not None:
@@ -445,28 +412,18 @@ def train_sanity_fit(
         cnt += 1
 
         if last_batch or batch_idx % log_interval == 0:
-            print(
-                "Train Sanity check passed for batch till {} batches".format(batch_idx)
-            )
+            print(f"Train Sanity check passed for batch till {batch_idx} batches")
 
         if num_batches is not None:
             if cnt >= num_batches:
-                print("Sanity check passed till {} train batches".format(cnt))
+                print(f"Sanity check passed till {cnt} train batches")
                 print("All specicied batches done.")
                 train_sanity_end = time.time()
-                print(
-                    "Training Sanity check passed in time {} !!".format(
-                        train_sanity_end - train_sanity_start
-                    )
-                )
+                print(f"Training Sanity check passed in time {train_sanity_end - train_sanity_start} !!")
                 return True
 
     train_sanity_end = time.time()
-    print(
-        "Training Sanity check passed in time {} !!".format(
-            train_sanity_end - train_sanity_start
-        )
-    )
+    print(f"Training Sanity check passed in time {train_sanity_end - train_sanity_start} !!")
     return True
 
 
@@ -508,30 +465,18 @@ def val_sanity_fit(
             cnt += 1
 
             if last_batch or batch_idx % log_interval == 0:
-                print(
-                    "Validation Sanity check passed for batch till {} batches".format(
-                        batch_idx
-                    )
-                )
+                print(f"Validation Sanity check passed for batch till {batch_idx} batches")
 
             if num_batches is not None:
                 if cnt >= num_batches:
-                    print("Sanity check passed till {} validation batches".format(cnt))
+                    print(f"Sanity check passed till {cnt} validation batches")
                     print("All specicied batches done.")
                     val_sanity_end = time.time()
-                    print(
-                        "Training Sanity check passed in time {} !!".format(
-                            val_sanity_end - val_sanity_start
-                        )
-                    )
+                    print(f"Training Sanity check passed in time {val_sanity_end - val_sanity_start} !!")
                     return True
 
     val_sanity_end = time.time()
-    print(
-        "Training Sanity check passed in time {} !!".format(
-            val_sanity_end - val_sanity_start
-        )
-    )
+    print("Training Sanity check passed in time {val_sanity_end - val_sanity_start} !!")
     return True
 
 

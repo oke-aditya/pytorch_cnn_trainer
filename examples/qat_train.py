@@ -15,14 +15,12 @@ from torch.quantization import convert
 
 if __name__ == "__main__":
 
-    train_ds, valid_ds = dataset.create_cifar10_dataset(
-        config.train_transforms, config.valid_transforms
-    )
+    train_ds, valid_ds = dataset.create_cifar10_dataset(config.train_transforms, config.valid_transforms)
+    
     train_loader, valid_loader = dataset.create_loaders(train_ds, valid_ds)
 
-    qat_model = model_factory.create_timm_model(
-        config.MODEL_NAME, config.NUM_ClASSES, config.IN_CHANNELS, config.PRETRAINED
-    )
+    qat_model = model_factory.create_timm_model(config.MODEL_NAME, config.NUM_ClASSES,
+                                                config.IN_CHANNELS, config.PRETRAINED)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(qat_model.parameters(), lr=1e-3)
@@ -42,15 +40,9 @@ if __name__ == "__main__":
     # NUM_TRAIN_BATCHES = 5 You can pass these too in train step if you want small subset to train
     # NUM_VAL_BATCHES = 5  You can pass these too in train step if you want small subset to validate
 
-    history = engine.fit(
-        epochs=config.EPOCHS,
-        model=qat_model,
-        train_loader=train_loader,
-        valid_loader=valid_loader,
-        criterion=criterion,
-        device=device,
-        optimizer=optimizer,
-        early_stopper=early_stopper,
+    history = engine.fit(epochs=config.EPOCHS, model=qat_model, train_loader=train_loader,
+                         valid_loader=valid_loader, criterion=criterion, device=device,
+                         optimizer=optimizer,early_stopper=early_stopper,
     )
 
     qat_model.cpu()  # We need to move to cpu for conversion.

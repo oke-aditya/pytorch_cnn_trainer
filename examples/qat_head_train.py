@@ -36,30 +36,28 @@ def create_combined_model(num_classes):
     new_head = nn.Sequential(nn.Dropout(0.4), nn.Linear(num_ftrs, num_classes))
 
     # Step 3. Combine, and don't forget the quant stubs.
-    new_model = nn.Sequential(model_fe_features, nn.Flatten(1), new_head,)
+    new_model = nn.Sequential(
+        model_fe_features,
+        nn.Flatten(1),
+        new_head,
+    )
 
     return new_model
 
 
 if __name__ == "__main__":
-    print("Setting Seed for the run, seed = {}".format(config.SEED))
+    print(f"Setting Seed for the run, seed = {config.SEED}")
     utils.seed_everything(config.SEED)
 
     print("Creating Train and Validation Dataset")
-    train_set, valid_set = dataset.create_cifar10_dataset(
-        config.train_transforms, config.valid_transforms
-    )
+    train_set, valid_set = dataset.create_cifar10_dataset(config.train_transforms, config.valid_transforms)
 
     print("Train and Validation Datasets Created")
 
     print("Creating DataLoaders")
-    train_loader, valid_loader = dataset.create_loaders(
-        train_set,
-        train_set,
-        config.TRAIN_BATCH_SIZE,
-        config.VALID_BATCH_SIZE,
-        config.NUM_WORKERS,
-    )
+    train_loader, valid_loader = dataset.create_loaders(train_set, train_set,
+                                                        config.TRAIN_BATCH_SIZE, config.VALID_BATCH_SIZE,
+                                                        config.NUM_WORKERS,)
 
     q_model = create_combined_model(config.NUM_ClASSES)
     # Currently the quantized models can only be run on CPU.
@@ -76,16 +74,7 @@ if __name__ == "__main__":
 
     early_stopper = utils.EarlyStopping(patience=3, verbose=True, path=config.SAVE_PATH)
 
-    history = engine.fit(
-        config.EPOCHS,
-        q_model,
-        train_loader,
-        valid_loader,
-        criterion,
-        device,
-        optimizer,
-        exp_lr_scheduler,
-        early_stopper,
-        num_batches=50,
-    )
+    history = engine.fit(config.EPOCHS, q_model, train_loader,
+                         valid_loader, criterion, device, optimizer,
+                         exp_lr_scheduler, early_stopper, num_batches=50,)
     print("Done")

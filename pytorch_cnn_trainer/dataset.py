@@ -17,8 +17,8 @@ __all__ = [
 
 
 def create_fashion_mnist_dataset(train_transforms, valid_transforms):
-    """ Creates Fashion MNIST train dataset and a test dataset. 
-    Args: 
+    """Creates Fashion MNIST train dataset and a test dataset.
+    Args:
     train_transforms: Transforms to be applied to train dataset.
     test_transforms: Transforms to be applied to test dataset.
     """
@@ -36,8 +36,8 @@ def create_fashion_mnist_dataset(train_transforms, valid_transforms):
 
 
 def create_cifar10_dataset(train_transforms, valid_transforms):
-    """ Creates CIFAR10 train dataset and a test dataset. 
-    Args: 
+    """Creates CIFAR10 train dataset and a test dataset.
+    Args:
     train_transforms: Transforms to be applied to train dataset.
     test_transforms: Transforms to be applied to test dataset.
     """
@@ -55,18 +55,18 @@ def create_cifar10_dataset(train_transforms, valid_transforms):
 
 def create_folder_dataset(root_dir, transforms, split: float = 0.8, **kwargs):
     """
-    Creates Train and Validation Dataset from a Root folder 
+    Creates Train and Validation Dataset from a Root folder
     Arrange dataset as follows: -
     root/class_a/image01.png
     root/class_b/image01.png
-    
+
     Creates train and validation dataset from this root dir.
     This applies same transforms to both train and validation
 
     Args:
     root_dir : Root directory of the dataset to read from
     transforms: Transforms to be applied to train and validation datasets.
-    split: Float number denoting percentage of train items 
+    split: Float number denoting percentage of train items
 
     """
     complete_dataset = datasets.ImageFolder(root_dir, transform=transforms)
