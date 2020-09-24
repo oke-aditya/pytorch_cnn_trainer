@@ -6,6 +6,9 @@
 ![PyPi Release](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/PyPi%20Release/badge.svg)
 ![Deploy mkdocs](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Deploy%20mkdocs/badge.svg)
 ![Install Package](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Install%20Package/badge.svg)
+[![Downloads](https://pepy.tech/badge/pytorch-cnn-trainer)](https://pepy.tech/project/pytorch-cnn-trainer)
+[![Downloads](https://pepy.tech/badge/pytorch-cnn-trainer/month)](https://pepy.tech/project/pytorch-cnn-trainer/month)
+[![Downloads](https://pepy.tech/badge/pytorch-cnn-trainer/week)](https://pepy.tech/project/pytorch-cnn-trainer/week)
 
 ## Train CNN for your task
 
