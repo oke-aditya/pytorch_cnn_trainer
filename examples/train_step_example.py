@@ -57,8 +57,10 @@ if __name__ == "__main__":
         print(f"Training Epoch = {epoch}")
         train_metrics = engine.train_step(model, train_loader, criterion, device, optimizer)
         print()
+        
         print(f"Validating Epoch = {epoch}")
         valid_metrics = engine.val_step(model, valid_loader, criterion, device)
+        
         validation_loss = valid_metrics["loss"]
         early_stopper(validation_loss, model=model)
 
