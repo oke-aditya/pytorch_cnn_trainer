@@ -375,7 +375,7 @@ def fit(
         )
 
         loss_f, top1_acc_f, top5_acc_f = [
-            train_metrics[i] for i in ("loss", "top1", "top5")
+            valid_metrics[i] for i in ("loss", "top1", "top5")
         ]
         loss_v.append(loss_f)
         top1_acc_v.append(top1_acc_f)
@@ -394,8 +394,9 @@ def fit(
 
     history = {
         "train": {"top1_acc": top1_acc, "top5_acc": top5_acc, "loss": loss},
-        "val": {"top1_acc": loss_v, "top5_acc": top5_acc_v, "loss": top1_acc_v},
+        "val": {"top1_acc":top1_acc_v, "top5_acc": top5_acc_v, "loss":loss_v }
     }
+
     return history  # For now, we should probably return an history object like keras.
 
 
