@@ -80,5 +80,5 @@ def test_plotting():
         epoch = 5
 
     history = engine.fit(epoch, model, train_loader, valid_loader, criterion, device, optimizer)
-    plotter.plot_results(history, metric1='loss', metric2='top5_acc')
+    plotter.plot_results(history, train_metric='loss', val_metric='top5_acc')
     return 1

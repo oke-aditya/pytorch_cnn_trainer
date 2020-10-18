@@ -46,7 +46,7 @@ def test_lit_trainer():
     for model_name in all_supported_models:
         model = CNN(model_name, num_classes=10, pretrained=True)
         # print(model)
-        trainer = pl.Trainer(max_epochs=2)
+        trainer = pl.Trainer(fast_dev_run=True)
         trainer.fit(model, train_loader, valid_loader)
     return True
 
