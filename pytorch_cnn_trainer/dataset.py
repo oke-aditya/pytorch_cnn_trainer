@@ -91,11 +91,11 @@ def create_loaders(
     """
     Creates train loader and test loader from train and test datasets
     Args:
-    train_dataset: Torchvision train dataset.
-    valid_dataset: Torchvision valid dataset.
-    train_batch_size (int) : Default 32, Training Batch size
-    valid_batch_size (int) : Default 32, Validation Batch size
-    num_workers (int) : Defualt 1, Number of workers for training and validation.
+        train_dataset: Torchvision train dataset.
+        valid_dataset: Torchvision valid dataset.
+        train_batch_size (int) : Default 32, Training Batch size
+        valid_batch_size (int) : Default 32, Validation Batch size
+        num_workers (int) : Defualt 1, Number of workers for training and validation.
     """
     train_loader = torch.utils.data.DataLoader(
         train_dataset, train_batch_size, shuffle=True, num_workers=num_workers
@@ -107,6 +107,15 @@ def create_loaders(
 
 
 class CSVDataset(Dataset):
+    """
+    Creates Torchvision Dataset From CSV File.
+    Args:
+        df: DataFrame with a column 2 columns image_id and target
+        data_dir: Directory from where data is to be read.
+        target: target column name
+        transform: Trasforms to apply while creating Dataset.
+    """
+
     def __init__(self, df, data_dir, target, transform):
         super().__init__()
         self.df = df

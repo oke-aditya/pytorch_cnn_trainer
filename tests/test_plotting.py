@@ -12,9 +12,10 @@ from pytorch_cnn_trainer import model_factory
 from pytorch_cnn_trainer import utils
 from pytorch_cnn_trainer import engine
 from torch.optim.swa_utils import SWALR
-from pytorch_cnn_trainer import plotter 
+from pytorch_cnn_trainer import plotter
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def test_plotting():
     print("Creating Train and Validation Dataset")
@@ -78,7 +79,6 @@ def test_plotting():
         swa_start = 2
         epoch = 5
 
-    history = engine.fit(epoch,model, train_loader,valid_loader,criterion, device, optimizer)
-    plotter.plot_results(history,metric1='loss',metric2='top5_acc')
-
+    history = engine.fit(epoch, model, train_loader, valid_loader, criterion, device, optimizer)
+    plotter.plot_results(history, metric1='loss', metric2='top5_acc')
     return 1
