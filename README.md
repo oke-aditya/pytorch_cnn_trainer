@@ -1,5 +1,8 @@
 # PyTorch CNN Trainer
 
+- Note that this PyPi package is no longer maintained. It will work fine upto this release, but I won't do bug fixes.
+- The entire code and API is migrated to [Quickvison](https://github.com/Quick-AI/quickvision), it has similar API and is maintained actively.
+
 ![Check Formatting](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/Check%20Formatting/badge.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![CI Tests](https://github.com/oke-aditya/pytorch_cnn_trainer/workflows/CI%20Tests/badge.svg)
